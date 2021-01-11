@@ -12,13 +12,13 @@ mat1 = [[1, 2, 3], [2, 3, 2]];
 mat2 = [[2, 3], [1, 2]];
 matrizes = [mat1, mat2]
 
-serverName = '10.0.0.129'
+serverName = '10.0.2.15'
 serverPort = 12000
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
-sentece = 'teste'
-clientSocket.send(bytes(matrizes, 'list'))
+sentece = input("Digite algo\n")
+clientSocket.send(sentence.encode())
 modifiedSetence = clientSocket.recv(1024)
 print('Resposta: ', modifiedSetence)
 clientSocket.close()

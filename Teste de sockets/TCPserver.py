@@ -12,12 +12,12 @@ print('O servidor está rodando')
 while True:
     connectionSocket, addr = serverSocket.accept()
     print('conexão aceita')
-    matrizes = connectionSocket.recv(1024)
-    print(matrizes)
+    sentence = connectionSocket.recv(1024)
+    print(sentence.upper())
      
-    #connectionSocket.send(mat2.mult_mat(mat1))
+    connectionSocket.send(sentence.upper())
     connectionSocket.close()
-    
+    print('conexão encerrada/enviada')
 """
 SSID:	TITA MADEREIRA_5G
 Protocolo:	Wi-Fi 5 (802.11ac)

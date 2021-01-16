@@ -1,7 +1,7 @@
 import socket
 import threading
+"""
 
-global bufferOcupado
 global nucleos
 
 class thread_maqA(threading.Thread):
@@ -54,18 +54,57 @@ class thread_maqA(threading.Thread):
                 # Se tiver ocupado manda a resposta ocupado
                 connectionSocket.send('Ocupado'.encode())
             
+"""
+def get_info(informacao):
+        mensagem = []
+        info = ''
+        for i in range(len(informacao)):
+            if (informacao[i] != '[' and informacao[i] != ']'):
+                info += informacao[i]
 
+        if (info.split(',')[0] == 'True'):
+            mensagem.append(True)
+        else:
+            mensagem.append(False)
 
+        mensagem.append(int(info.split(',')[1]))
+        mensagem.append(int(info.split(',')[2]))
+
+        return mensagem
+
+bufferOcupado = False
 serverPortsBuffer = [13000, 14000]
 bufferOcupado = False
 nucleos = [[False], [False, False], [False, False, False]]
 
 semaforo = threading.Semaphore()
 
+"""
 while True:
     threadB = thread_maqA(12100)
+"""
 
-
+socktBuffer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+socktBuffer.bind(('', 12100))
+socktBuffer.listen(1)
 print('Maquina A rodando')
-  
+while True:
+        connectionSocket, addr = socktBuffer.accept()
+        informacao = connectionSocket.recv(1024)
+        # checa se pode entrar na região critica
+        if (not(bufferOcupado)):
+                # Se poder atualiza que entrou na região critica
+                bufferOcupado = True
+
+                #atualiza a informacao
+                info = get_info(informacao.decode())
+                nucleos[info[1]-1][info[2]-1] = info[0]
+                connectionSocket.send('Atualizado'.encode())
+                connectionSocket.close()
+
+                # Sai da região critica
+                bufferOcupado = False
+        else:
+                # Se tiver ocupado manda a resposta ocupado
+                connectionSocket.send('Ocupado'.encode())
     

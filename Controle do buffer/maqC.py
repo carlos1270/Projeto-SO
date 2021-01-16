@@ -4,7 +4,7 @@ def set_nucleo(semaforo, maquina, nucleo):
     atulizarInformacaoNucleo = True
 
     serverName = '10.0.0.129'
-    serverPort = 12102
+    serverPort = 12100
 
     clientSocketBuffer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     clientSocketBuffer.connect((serverName, serverPort))

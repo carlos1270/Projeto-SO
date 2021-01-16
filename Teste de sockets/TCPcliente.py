@@ -9,7 +9,7 @@ import socket
 from Models.Matriz import Matriz
 import threading
 
-serverName = '10.0.2.15'
+serverName = '10.0.0.129'
 serverPort = 12000
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

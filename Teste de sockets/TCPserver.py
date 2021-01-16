@@ -20,7 +20,7 @@ while True:
      
     connectionSocket.send(str(mat2.mult_mat(mat1)).encode())
     connectionSocket.close()
-    
+    print('conexão encerrada/enviada')
 """
 mat1 = Matriz(str_matriz(str(matriz).encode()))
 mat2 = Matriz(str_matriz(str(matriz).encode()))

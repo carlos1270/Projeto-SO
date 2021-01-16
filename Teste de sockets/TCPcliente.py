@@ -4,23 +4,20 @@ Created on Fri Dec 25 18:24:37 2020
 
 @author: carlo
 """
-
+from decodificadorDeStringParaMatrizes import *
 import socket
 from Models.Matriz import Matriz
-
-mat1 = [[1, 2, 3], [2, 3, 2]];
-mat2 = [[2, 3], [1, 2]];
-matrizes = [mat1, mat2]
+import threading
 
 serverName = '10.0.2.15'
 serverPort = 12000
 
 clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientSocket.connect((serverName, serverPort))
-sentece = input("Digite algo\n")
-clientSocket.send(sentence.encode())
+print(matriz)
+clientSocket.send(str(matriz).encode())
 modifiedSetence = clientSocket.recv(1024)
-print('Resposta: ', modifiedSetence)
+print('Resposta: ', modifiedSetence.decode())
 clientSocket.close()
 
 """

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from decodificadorDeStringParaMatrizes import *
 import socket
 from Models.Matriz import Matriz
 
@@ -12,13 +13,21 @@ print('O servidor está rodando')
 while True:
     connectionSocket, addr = serverSocket.accept()
     print('conexão aceita')
-    sentence = connectionSocket.recv(1024)
-    print(sentence.upper())
+    matrizes = connectionSocket.recv(1024)
+    mat1 = Matriz(str_matriz(matrizes.decode())[0])
+    mat2 = Matriz(str_matriz(matrizes.decode())[1])
+    print(mat2.mult_mat(mat1))
      
-    connectionSocket.send(sentence.upper())
+    connectionSocket.send(str(mat2.mult_mat(mat1)).encode())
     connectionSocket.close()
     print('conexão encerrada/enviada')
 """
+mat1 = Matriz(str_matriz(str(matriz).encode()))
+mat2 = Matriz(str_matriz(str(matriz).encode()))
+print(mat2.mult_mat(mat1))
+
+
+    
 SSID:	TITA MADEREIRA_5G
 Protocolo:	Wi-Fi 5 (802.11ac)
 Tipo de segurança:	WPA2-Personal

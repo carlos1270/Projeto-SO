@@ -72,24 +72,12 @@ def get_info(informacao):
 
         return mensagem
 
-bufferOcupado = False
-serverPortsBuffer = [13000, 14000]
-bufferOcupado = False
+
 nucleos = [[False], [False, False], [False, False, False]]
+bufferOcupado = False
 
-semaforo = threading.Semaphore()
-
-"""
-while True:
-    threadB = thread_maqA(12100)
-"""
-
-socktBuffer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-socktBuffer.bind(('', 12100))
-socktBuffer.listen(1)
-print('Maquina A rodando')
-while True:
-        connectionSocket, addr = socktBuffer.accept()
+def thread(connectionSocket):
+        global bufferOcupado
         informacao = connectionSocket.recv(1024)
         # checa se pode entrar na região critica
         if (not(bufferOcupado)):
@@ -107,4 +95,21 @@ while True:
         else:
                 # Se tiver ocupado manda a resposta ocupado
                 connectionSocket.send('Ocupado'.encode())
+
+
+
+semaforo = threading.Semaphore()
+
+"""
+while True:
+    threadB = thread_maqA(12100)
+"""
+
+socktBuffer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+socktBuffer.bind(('', 12100))
+socktBuffer.listen(1)
+print('Maquina A rodando')
+while True:
+        connectionSocket, addr = socktBuffer.accept()
+        thread(connectionSocket)
     

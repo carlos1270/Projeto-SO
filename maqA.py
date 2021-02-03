@@ -1,18 +1,15 @@
-import time
 import socket
 import threading
 import ConverterEReceberMatriz as cnvMatriz
 import multiMatrizes
+import cliente
 
-
-global ipCliente, maqA, maqB
-ipCliente = '172.17.0.1'
-maqA = '172.17.0.2'
-maqB = '172.17.0.3'
-maqC = '172.17.0.4'
-
-global nucleos
+global nucleos, maqA, maqB, maqC
 nucleos = [[False], [False, False], [False, False, False]]
+
+maqA = '192.168.56.1'
+maqB = '192.168.56.102'
+maqC = '192.168.56.103'
 
 class ThreadMaquinas(threading.Thread):
     def __init__(self, connectionMaquina, addrMaquina):
@@ -34,26 +31,25 @@ class ThreadMaquinas(threading.Thread):
         self.connectionMaquina.close()
         print(nucleos)
 
-
+                
 class MyThread(threading.Thread):
     def __init__(self, connectionSocket, addr):
         threading.Thread.__init__(self)
         self.connectionSocket = connectionSocket
         self.addr = addr
-
+        
     def run(self):
         print("Requisicao do cliente recebida")
         matrizes = self.connectionSocket.recv(1024)
         resposta = verificarDisponibilidade(matrizes.decode())
         self.connectionSocket.send(resposta.encode())
         self.connectionSocket.close()
-
+        
 def get_info(informacao):
     mensagem = list(map(int, informacao.split(" ")))
     return mensagem
 
 def atualizarNucleo(server, porta, liberado, maquina, nucleo):
-    print("Atualizando núcleos")
     atualizarInformacaoNucleo = True
     clientSocketBuffer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     clientSocketBuffer.connect((server, porta))
@@ -66,7 +62,6 @@ def atualizarNucleo(server, porta, liberado, maquina, nucleo):
 
         resposta = clientSocketBuffer.recv(1024)
         if (resposta.decode() == 'Atualizado'):
-            print(nucleos)
             atualizarInformacaoNucleo = False
             clientSocketBuffer.close()
         else:
@@ -78,53 +73,58 @@ def atualizarNucleoLocal(liberado, maquina, nucleo):
     semaforo.release()
 
 def processarMatriz(matrizes):
-    time.sleep(30)
+    print("Processando uma matriz")
     matrizesConvertidas = cnvMatriz.dividirEntrada(matrizes)
-    if(multiMatrizes.mult_valida(matrizesConvertidas[0], matrizesConvertidas[1])):
+    if(multiMatrizes.mult_valida(matrizesConvertidas[0], matrizesConvertidas[1])): 
        return str(multiMatrizes.mult_mat(matrizesConvertidas[0], matrizesConvertidas[1]))
     else:
         return("Multiplicação impossível")
-
-def controlarBufferNucleos(ip1, maquina, nucleo, matrizes):
+    
+def controlarBufferNucleos(maquina, nucleo, matrizes):
     atualizarNucleoLocal(True, maquina, nucleo)
-    atualizarNucleo(ip1, 12000, True, maquina, nucleo)
+    atualizarNucleo(maqB, 12000, True, maquina, nucleo)
+    atualizarNucleo(maqC, 12000, True, maquina, nucleo)
     matriz = processarMatriz(matrizes)
     atualizarNucleoLocal(False, maquina, nucleo)
-    atualizarNucleo(ip1, 12000, False, maquina, nucleo)
+    atualizarNucleo(maqB, 12000, False, maquina, nucleo)
+    atualizarNucleo(maqC, 12000, False, maquina, nucleo)
+    print("Matriz processada")
     return matriz
 
+def redirecionarMatrizes(maquina, matrizes):
+    thread = cliente.ClienteThread(maquina, 12100)
+    thread.socket.send(matrizes.encode())
+    resposta = thread.socket.recv(1024)
+    return resposta.decode()
+    
 def verificarDisponibilidade(matrizes):
     print("Verificando onde pode processar a matriz")
     maquinaEncontrada = False
-
     while maquinaEncontrada == False:
         if(nucleos[0][0] == False):
             maquinaEncontrada = True
             print("Processando na máquina A")
-            return controlarBufferNucleos(maqA, 1, 1, matrizes)
-
+            return controlarBufferNucleos(1, 1, matrizes)
         elif(nucleos[1][0] == False):
             maquinaEncontrada = True
             print("Processando na máquina B, máquina A está indisponível no momento.")
-            return controlarBufferNucleos(maqB, 2, 1, matrizes)
-
+            return redirecionarMatrizes(maqB, matrizes)
         elif(nucleos[1][1] == False):
             maquinaEncontrada = True
             print("Processando na máquina B, máquina A está indisponível no momento.")
-            return controlarBufferNucleos(maqB, 2, 2, matrizes)
-
+            return redirecionarMatrizes(maqB, matrizes)
         elif(nucleos[2][0] == False):
             maquinaEncontrada = True
-            return "Processando na máquina C, máquina A está indisponível no momento."
-
+            print("Processando na máquina C, máquina A está indisponível no momento.")
+            return redirecionarMatrizes(maqC, matrizes)
         elif(nucleos[2][1] == False):
             maquinaEncontrada = True
-            return "Processando na máquina C, máquina A está indisponível no momento."
-
+            print("Processando na máquina C, máquina A está indisponível no momento.")
+            return redirecionarMatrizes(maqC, matrizes)
         elif(nucleos[2][2] == False):
             maquinaEncontrada = True
-            return "Processando na máquina C, máquina A está indisponível no momento."
-
+            print("Processando na máquina C, máquina A está indisponível no momento.")
+            return redirecionarMatrizes(maqC, matrizes)
         else:
             print("Nenhuma máquina disponível")
 
@@ -139,7 +139,7 @@ def startServer():
         connectionMaquina, addrMaquina = socketMaquinas.accept()
         threadMaquina = ThreadMaquinas(connectionMaquina, addrMaquina)
         threadMaquina.start()
-
+        
 global semaforo, socktBuffer, socketMaquinas
 
 semaforo = threading.Semaphore()

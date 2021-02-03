@@ -87,11 +87,11 @@ def processarMatriz(matrizes):
 def controlarBufferNucleos(maquina, nucleo, matrizes):
     atualizarNucleoLocal(True, maquina, nucleo)
     atualizarNucleo(maqA, 12000, True, maquina, nucleo)
-    atualizarNucleo(maqC, 12000, True, maquina, nucleo)
+    atualizarNucleo(maqB, 12000, True, maquina, nucleo)
     matriz = processarMatriz(matrizes)
     atualizarNucleoLocal(False, maquina, nucleo)
     atualizarNucleo(maqA, 12000, False, maquina, nucleo)
-    atualizarNucleo(maqC, 12000, False, maquina, nucleo)
+    atualizarNucleo(maqB, 12000, False, maquina, nucleo)
     print("Matriz processada")
     return matriz
 
@@ -105,29 +105,28 @@ def verificarDisponibilidade(matrizes):
     print("Verificando onde processar a matriz")
     maquinaEncontrada = False
     while maquinaEncontrada == False:
-        if(nucleos[1][0] == False):
-            print("Processando na máquina B")
+        if(nucleos[2][0] == False):
+            print("Processando na máquina C")
             maquinaEncontrada = True
-            return controlarBufferNucleos(2, 1, matrizes)
-        elif(nucleos[1][1] == False):
-            maquinaEncontrada = True
-            return controlarBufferNucleos(2, 2, matrizes)
-        elif(nucleos[0][0] == False):
-            maquinaEncontrada = True
-            print("Processando na máquina A, máquina B está indisponível no momento.")
-            return redirecionarMatrizes(maqA, matrizes)
-        elif(nucleos[2][0] == False):
-            maquinaEncontrada = True
-            print("Processando na máquina C, máquina B está indisponível no momento.")
-            return redirecionarMatrizes(maqC, matrizes)
+            return controlarBufferNucleos(3, 1, matrizes)
         elif(nucleos[2][1] == False):
             maquinaEncontrada = True
-            print("Processando na máquina C, máquina B está indisponível no momento.")
-            return redirecionarMatrizes(maqC, matrizes)
+            return controlarBufferNucleos(3, 2, matrizes)
         elif(nucleos[2][2] == False):
             maquinaEncontrada = True
-            print("Processando na máquina C, máquina B está indisponível no momento.")
-            return redirecionarMatrizes(maqC, matrizes)
+            return controlarBufferNucleos(3, 3, matrizes)
+        elif(nucleos[0][0] == False):
+            maquinaEncontrada = True
+            print("Processando na máquina A, máquina C está indisponível no momento.")
+            return redirecionarMatrizes(maqA, matrizes)
+        elif(nucleos[1][0] == False):
+            maquinaEncontrada = True
+            print("Processando na máquina B, máquina C está indisponível no momento.")
+            return redirecionarMatrizes(maqB, matrizes)
+        elif(nucleos[1][1] == False):
+            maquinaEncontrada = True
+            print("Processando na máquina B, máquina C está indisponível no momento.")
+            return redirecionarMatrizes(maqB, matrizes)
         else:
             print("Nenhuma máquina disponível")
 
@@ -152,7 +151,7 @@ socktBuffer.listen(2)
 socketMaquinas = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 socketMaquinas.bind(('', 12000))
 socketMaquinas.listen(2)
-print('Maquina B rodando')
+print('Maquina C rodando')
 
 t1 = threading.Thread(target=startCliente)
 t2 = threading.Thread(target=startServer)

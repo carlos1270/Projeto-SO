@@ -20,7 +20,7 @@ def enviarMatriz(thread):
     #coloca tudo das duas matrizes em uma unica string pra enviar
     entrada = linhas_A+' '+colunas_A+' '+matrizA+' '+linhas_B+' '+colunas_B+' '+matrizB
     thread.socket.send(entrada.encode())
-        
+
 
 if __name__ == '__main__':
     entrada = "Requisitar"
@@ -28,17 +28,30 @@ if __name__ == '__main__':
         print("Digite uma máquina: ", end = "")
         entrada = input()
         if(entrada == "A"):
-            thread = ClienteThread("192.168.56.1", 12100)
-            enviarMatriz(thread)
-            resposta = thread.socket.recv(1024)
-            print(resposta.decode())
+            try:
+                thread = ClienteThread('172.17.0.2', 12100)
+                enviarMatriz(thread)
+                resposta = thread.socket.recv(1024)
+                print(resposta.decode())
+            except:
+                print("Maquina indisponivel no momento")
+                continue
+
         elif(entrada == "B"):
-            thread = ClienteThread("192.168.56.102", 12100)
-            enviarMatriz(thread)
-            resposta = thread.socket.recv(1024)
-            print(resposta.decode())
+            try:
+                thread = ClienteThread('172.17.0.3', 12100)
+                enviarMatriz(thread)
+                resposta = thread.socket.recv(1024)
+                print(resposta.decode())
+            except:
+                print("Maquina indisponivel no momento")
+                continue
+
         elif(entrada == "C"):
-            thread = ClienteThread("192.168.56.103", 12100)
-            enviarMatriz(thread)
-            resposta = thread.socket.recv(1024)
-            print(resposta.decode())
+            try:
+                thread = ClienteThread('172.17.0.4', 12100)
+                enviarMatriz(thread)
+                resposta = thread.socket.recv(1024)
+                print(resposta.decode())
+            except:
+                print("Maquina indisponivel no momento")

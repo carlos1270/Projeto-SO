@@ -1,4 +1,7 @@
+import time
+
 def converterStringMatriz(linhas, colunas, matAux):
+    time.sleep(15)
     if(len(matAux) == linhas*colunas):
         matriz = []
         for k in range(0, linhas*colunas, colunas):
@@ -7,7 +10,7 @@ def converterStringMatriz(linhas, colunas, matAux):
         return matriz
     else:
         print("Matriz inválida")
-        
+
 def dividirEntrada(entrada):
     entradaAux = list(map(int, entrada.split(" ")))
     linhas_A = entradaAux[0]
